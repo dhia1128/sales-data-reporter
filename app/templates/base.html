@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ app_name }}{% endblock %}</title>
+  <style>
+    :root {
+      --bg: #f5f6f4; --panel: #ffffff; --text: #1d2521; --muted: #5f6b65;
+      --line: #dfe3df; --accent: #1f6f5c; --accent-ink: #ffffff;
+      --warn-bg: #fff4e0; --warn: #8a5300; --bad-bg: #fdeceb; --bad: #a3271f;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #131816; --panel: #1b221f; --text: #e6ebe8; --muted: #9aa8a0;
+        --line: #2b3530; --accent: #4fb89d; --accent-ink: #0d1512;
+        --warn-bg: #2d2412; --warn: #f0b95c; --bad-bg: #2f1a19; --bad: #ff8f86;
+      }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text);
+           font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    main { max-width: 62rem; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    h1 { font-size: 1.6rem; margin: 0 0 .25rem; }
+    h2 { font-size: 1.1rem; margin: 2rem 0 .75rem; }
+    a { color: var(--accent); }
+    .muted { color: var(--muted); }
+    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 1.25rem; }
+    .notice { padding: .75rem 1rem; border-radius: 8px; margin: 1rem 0; }
+    .notice.warn { background: var(--warn-bg); color: var(--warn); }
+    .notice.bad { background: var(--bad-bg); color: var(--bad); }
+    button, .button { font: inherit; background: var(--accent); color: var(--accent-ink); border: 0;
+                      border-radius: 6px; padding: .55rem 1rem; cursor: pointer; text-decoration: none; }
+    button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    button.quiet { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+    table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+    th, td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid var(--line); }
+    th { font-weight: 600; color: var(--muted); }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .scroll { overflow-x: auto; }
+    .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 1rem; }
+    .facts dt { color: var(--muted); font-size: .85rem; }
+    .facts dd { margin: 0; font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+    .summary-content { border-inline-start: 3px solid var(--accent); line-height: 1.75; padding: 1.25rem 1.5rem; }
+    .summary-content > :first-child { margin-top: 0; }
+    .summary-content > :last-child { margin-bottom: 0; }
+    .summary-content h1, .summary-content h2, .summary-content h3 { line-height: 1.35; }
+    .summary-content h1 { font-size: 1.25rem; }
+    .summary-content h2 { font-size: 1.08rem; margin: 1.5rem 0 .5rem; }
+    .summary-content p { margin: .65rem 0; }
+    .summary-content p:has(> strong:only-child) { border-bottom: 1px solid var(--line); color: var(--accent); font-size: 1.05rem; margin: 1.4rem 0 .45rem; padding-bottom: .35rem; }
+    .summary-content p:has(> strong:only-child) strong { color: inherit; }
+    .summary-content ul, .summary-content ol { margin: .5rem 0 1rem; padding-inline-start: 1.5rem; }
+    .summary-content li { padding-inline-start: .2rem; }
+    .summary-content li + li { margin-top: .35rem; }
+    .summary-content li::marker { color: var(--accent); }
+  </style>
+</head>
+<body><main>{% block content %}{% endblock %}</main></body>
+</html>

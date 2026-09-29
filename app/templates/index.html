@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ app_name }}</h1>
+<p class="muted">Upload a CSV with any columns. The app works out what each column holds, then writes a report.</p>
+
+{% if error %}<div class="notice bad" role="alert">{{ error }}</div>{% endif %}
+
+<form class="panel" action="/analyze" method="post" enctype="multipart/form-data">
+  <label for="file"><strong>CSV file</strong></label><br>
+  <input id="file" type="file" name="file" accept=".csv" required>
+  <button type="submit" style="margin-left:.75rem">Analyze file</button>
+</form>
+
+{% if reports %}
+<h2>Recent reports</h2>
+<div class="panel scroll">
+  <table>
+    <thead><tr><th>File</th><th class="num">Rows</th><th class="num">Columns</th><th>Status</th><th>Created</th></tr></thead>
+    <tbody>
+    {% for r in reports %}
+      <tr>
+        <td><a href="/reports/{{ r.id }}">{{ r.dataset.original_filename }}</a></td>
+        <td class="num">{{ r.dataset.n_rows }}</td>
+        <td class="num">{{ r.dataset.n_columns }}</td>
+        <td>{{ "Complete" if r.status == "completed" else "No AI summary" }}</td>
+        <td class="muted">{{ r.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

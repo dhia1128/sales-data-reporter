@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}{{ report.dataset.original_filename }} · {{ app_name }}{% endblock %}
+{% block content %}
+{% set ts = stats.time_series %}
+{% set ov = stats.overview %}
+
+<p><a href="/">Back to uploads</a></p>
+<h1>{{ report.dataset.original_filename }}</h1>
+<p class="muted">Report #{{ report.id }} · {{ report.created_at.strftime("%Y-%m-%d %H:%M") }} · model {{ report.llm_model }}</p>
+
+<dl class="panel facts">
+  <div><dt>Rows</dt><dd>{{ ov.rows }}</dd></div>
+  <div><dt>Columns</dt><dd>{{ ov.columns }}</dd></div>
+  <div><dt>Missing cells</dt><dd>{{ ov.missing_pct | fmt }}%</dd></div>
+  {% if ov.date_range %}
+  <div><dt>Date range</dt><dd style="font-size:1rem">{{ ov.date_range.start }} to {{ ov.date_range.end }}</dd></div>
+  {% endif %}
+</dl>
+
+{% if ts %}
+<h2>{{ ts.measure }} by {{ ts.granularity }}</h2>
+<div class="panel">
+  <p style="margin-top:0">
+    <strong>{{ ts.last_change_pct | pct }}</strong> from {{ ts.previous_period }} to {{ ts.last_period }}
+    <span class="muted"> · {{ ts.total_change_pct | pct }} since the first period · trend {{ ts.trend or "unclear" }}</span>
+  </p>
+  <canvas id="series" height="110" role="img" aria-label="{{ ts.measure }} over time"></canvas>
+</div>
+{% endif %}
+
+<h2>Summary</h2>
+{% if report.error %}
+<div class="notice warn" role="status">
+  {{ report.error }}
+</div>
+{% endif %}
+<form action="/reports/{{ report.id }}/regenerate" method="post" style="margin:.5rem 0">
+  <button class="quiet" type="submit">Regenerate summary</button>
+</form>
+{% if report.summary %}
+<article class="panel summary-content" dir="auto">{{ report.summary | summary_markdown }}</article>
+{% endif %}
+
+{% if stats.warnings %}
+<h2>Data quality</h2>
+<ul>{% for w in stats.warnings %}<li>{{ w }}</li>{% endfor %}</ul>
+{% endif %}
+
+{% if stats.measures %}
+<h2>Numeric columns</h2>
+<div class="panel scroll">
+  <table>
+    <thead><tr><th>Column</th><th class="num">Sum</th><th class="num">Mean</th><th class="num">Median</th><th class="num">Min</th><th class="num">Max</th><th class="num">Outliers</th></tr></thead>
+    <tbody>
+    {% for m in stats.measures %}
+      <tr><td>{{ m.name }}</td><td class="num">{{ m.sum | fmt }}</td><td class="num">{{ m.mean | fmt }}</td>
+          <td class="num">{{ m.median | fmt }}</td><td class="num">{{ m.min | fmt }}</td>
+          <td class="num">{{ m.max | fmt }}</td><td class="num">{{ m.outliers }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% for b in stats.breakdowns %}
+<h2>Top {{ b.column }} <span class="muted" style="font-weight:400">({{ b.metric }})</span></h2>
+<div class="panel scroll">
+  <table>
+    <thead><tr><th>{{ b.column }}</th><th class="num">Amount</th><th class="num">Share</th></tr></thead>
+    <tbody>
+    {% for t in b.top %}
+      <tr><td>{{ t.value }}</td><td class="num">{{ t.amount | fmt }}</td><td class="num">{{ t.share_pct | fmt }}%</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endfor %}
+
+{% if stats.correlations %}
+<h2>Strong correlations</h2>
+<ul>{% for c in stats.correlations %}<li>{{ c.a }} and {{ c.b }}: r = {{ c.r }}</li>{% endfor %}</ul>
+{% endif %}
+
+<h2>How the columns were read</h2>
+<div class="panel scroll">
+  <table>
+    <thead><tr><th>Column</th><th>Detected as</th><th class="num">Unique</th><th class="num">Missing</th></tr></thead>
+    <tbody>
+    {% for c in stats.columns %}
+      <tr><td>{{ c.name }}</td><td>{{ c.role }}</td><td class="num">{{ c.unique }}</td><td class="num">{{ c.missing_pct | fmt }}%</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if ts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+  const pts = {{ ts.points | tojson }};
+  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const ink = dark ? "#9aa8a0" : "#5f6b65";
+  new Chart(document.getElementById("series"), {
+    type: "line",
+    data: {
+      labels: pts.map(p => p.period),
+      datasets: [{ label: {{ ts.measure | tojson }}, data: pts.map(p => p.value),
+                   borderColor: dark ? "#4fb89d" : "#1f6f5c", tension: .25, pointRadius: 3 }]
+    },
+    options: { plugins: { legend: { display: false } },
+               scales: { x: { ticks: { color: ink } }, y: { ticks: { color: ink } } } }
+  });
+</script>
+{% endif %}
+{% endblock %}
