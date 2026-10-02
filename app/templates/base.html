@@ -3,44 +3,83 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f6f5c'/%3E%3Crect x='6' y='18' width='4.5' height='8' rx='1' fill='%23fff' opacity='.55'/%3E%3Crect x='13.75' y='13' width='4.5' height='13' rx='1' fill='%23fff' opacity='.55'/%3E%3Crect x='21.5' y='8' width='4.5' height='18' rx='1' fill='%23fff' opacity='.55'/%3E%3Cpath d='M6.5 16 L14 11 L18 14 L25.5 6' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <title>{% block title %}{{ app_name }}{% endblock %}</title>
   <style>
     :root {
-      --bg: #f5f6f4; --panel: #ffffff; --text: #1d2521; --muted: #5f6b65;
-      --line: #dfe3df; --accent: #1f6f5c; --accent-ink: #ffffff;
+      --bg: #f3f5f2; --panel: #ffffff; --panel-2: #f8faf8; --text: #18211d; --muted: #5b6861;
+      --line: #dde3de; --line-strong: #c6cfc8; --accent: #1f6f5c; --accent-soft: #e3f1ec; --accent-ink: #ffffff;
       --warn-bg: #fff4e0; --warn: #8a5300; --bad-bg: #fdeceb; --bad: #a3271f;
+      --radius: 10px; --shadow: 0 1px 2px rgba(20,32,27,.05);
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #131816; --panel: #1b221f; --text: #e6ebe8; --muted: #9aa8a0;
-        --line: #2b3530; --accent: #4fb89d; --accent-ink: #0d1512;
+        --bg: #101513; --panel: #182019; --panel-2: #1d2721; --text: #e6ebe8; --muted: #9aa8a0;
+        --line: #28332d; --line-strong: #364439; --accent: #4fb89d; --accent-soft: #1a2b25; --accent-ink: #0d1512;
         --warn-bg: #2d2412; --warn: #f0b95c; --bad-bg: #2f1a19; --bad: #ff8f86;
+        --shadow: none;
       }
     }
     * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
     body { margin: 0; background: var(--bg); color: var(--text);
-           font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-    main { max-width: 62rem; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
-    h1 { font-size: 1.6rem; margin: 0 0 .25rem; }
-    h2 { font-size: 1.1rem; margin: 2rem 0 .75rem; }
-    a { color: var(--accent); }
+           font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+
+    .topbar { background: var(--panel); border-bottom: 1px solid var(--line); }
+    .topbar-inner { max-width: 66rem; margin: 0 auto; padding: .8rem 1.25rem; display: flex; align-items: center; gap: .6rem; }
+    .brand { display: inline-flex; align-items: center; gap: .65rem; font-weight: 650; font-size: 1.08rem; color: var(--text); text-decoration: none; letter-spacing: -.01em; }
+    .brand-mark { width: 1.9rem; height: 1.9rem; flex: none; display: block; }
+    .brand-mark .bg { fill: var(--accent); }
+    .brand-mark .bar { fill: var(--accent-ink); opacity: .55; }
+    .brand-mark .line { stroke: var(--accent-ink); fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .brand-mark .dot { fill: var(--accent-ink); }
+
+    main { max-width: 66rem; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    h1 { font-size: 1.85rem; line-height: 1.2; letter-spacing: -.02em; margin: 0 0 .4rem; overflow-wrap: anywhere; }
+    h2 { font-size: 1.1rem; letter-spacing: -.01em; margin: 2.25rem 0 .8rem; }
+    a { color: var(--accent); text-underline-offset: .18em; }
     .muted { color: var(--muted); }
-    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 1.25rem; }
-    .notice { padding: .75rem 1rem; border-radius: 8px; margin: 1rem 0; }
-    .notice.warn { background: var(--warn-bg); color: var(--warn); }
-    .notice.bad { background: var(--bad-bg); color: var(--bad); }
-    button, .button { font: inherit; background: var(--accent); color: var(--accent-ink); border: 0;
-                      border-radius: 6px; padding: .55rem 1rem; cursor: pointer; text-decoration: none; }
+    .lead { font-size: 1.05rem; max-width: 42rem; margin: 0 0 1.5rem; }
+    .back { display: inline-block; margin-bottom: 1rem; font-size: .92rem; text-decoration: none; }
+    .back:hover { text-decoration: underline; }
+
+    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+             padding: 1.25rem; box-shadow: var(--shadow); }
+    .notice { padding: .8rem 1rem; border-radius: var(--radius); margin: 1rem 0; border: 1px solid transparent; }
+    .notice.warn { background: var(--warn-bg); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 25%, transparent); }
+    .notice.bad { background: var(--bad-bg); color: var(--bad); border-color: color-mix(in srgb, var(--bad) 25%, transparent); }
+
+    button, .button { font: inherit; font-weight: 550; background: var(--accent); color: var(--accent-ink); border: 1px solid var(--accent);
+                      border-radius: 8px; padding: .55rem 1.05rem; cursor: pointer; text-decoration: none;
+                      transition: filter .15s, background-color .15s; }
+    button:hover, .button:hover { filter: brightness(1.08); }
     button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-    button.quiet { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+    button.quiet { background: transparent; color: var(--accent); border: 1px solid var(--line-strong); }
+    button.quiet:hover { background: var(--accent-soft); border-color: var(--accent); filter: none; }
+
     table { width: 100%; border-collapse: collapse; font-size: .92rem; }
-    th, td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid var(--line); }
-    th { font-weight: 600; color: var(--muted); }
+    th, td { text-align: left; padding: .6rem .8rem; border-bottom: 1px solid var(--line); }
+    th { font-weight: 600; color: var(--muted); font-size: .85rem; background: var(--panel-2); white-space: nowrap; }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:hover td { background: var(--panel-2); }
     td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
-    .scroll { overflow-x: auto; }
-    .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 1rem; }
+    .scroll { overflow-x: auto; padding: 0; }
+    .scroll table { min-width: 34rem; }
+
+    .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0; padding: 0; overflow: hidden; margin: 1.25rem 0 0; }
+    .facts > div { padding: 1rem 1.25rem; border-inline-end: 1px solid var(--line); }
+    .facts > div:last-child { border-inline-end: 0; }
     .facts dt { color: var(--muted); font-size: .85rem; }
-    .facts dd { margin: 0; font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+    .facts dd { margin: .15rem 0 0; font-size: 1.5rem; font-weight: 600; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+    @media (max-width: 40rem) {
+      .facts { grid-template-columns: repeat(2, 1fr); }
+      .facts > div { border-bottom: 1px solid var(--line); }
+    }
+
+    .section-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; margin: 2.25rem 0 .8rem; }
+    .section-head h2 { margin: 0; }
+    .section-head form { margin: 0 !important; }
+
     .summary-content { border-inline-start: 3px solid var(--accent); line-height: 1.75; padding: 1.25rem 1.5rem; }
     .summary-content > :first-child { margin-top: 0; }
     .summary-content > :last-child { margin-bottom: 0; }
@@ -54,7 +93,26 @@
     .summary-content li { padding-inline-start: .2rem; }
     .summary-content li + li { margin-top: .35rem; }
     .summary-content li::marker { color: var(--accent); }
+
+    .plain-list { margin: 0; padding: 0; list-style: none; display: grid; gap: .5rem; }
+    .plain-list li { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: .6rem .9rem; }
+
+    @media print {
+      body { background: #fff; }
+      .topbar, form, .back { display: none !important; }
+      .panel { box-shadow: none; break-inside: avoid; }
+    }
   </style>
 </head>
-<body><main>{% block content %}{% endblock %}</main></body>
+<body>
+  <header class="topbar"><div class="topbar-inner"><a class="brand" href="/"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+    <rect class="bg" width="32" height="32" rx="8"/>
+    <rect class="bar" x="6" y="18" width="4.5" height="8" rx="1"/>
+    <rect class="bar" x="13.75" y="13" width="4.5" height="13" rx="1"/>
+    <rect class="bar" x="21.5" y="8" width="4.5" height="18" rx="1"/>
+    <path class="line" d="M6.5 16 L14 11 L18 14 L25.5 6"/>
+    <circle class="dot" cx="25.5" cy="6" r="1.6"/>
+  </svg>{{ app_name }}</a></div></header>
+  <main>{% block content %}{% endblock %}</main>
+</body>
 </html>

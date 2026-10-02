@@ -1,14 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>{{ app_name }}</h1>
-<p class="muted">Upload a CSV with any columns. The app works out what each column holds, then writes a report.</p>
+<p class="muted lead">Upload a CSV with any columns. The app works out what each column holds, then writes a report.</p>
 
 {% if error %}<div class="notice bad" role="alert">{{ error }}</div>{% endif %}
 
-<form class="panel" action="/analyze" method="post" enctype="multipart/form-data">
-  <label for="file"><strong>CSV file</strong></label><br>
-  <input id="file" type="file" name="file" accept=".csv" required>
-  <button type="submit" style="margin-left:.75rem">Analyze file</button>
+<style>
+  .upload { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding: 1.5rem;
+            border: 2px dashed var(--line-strong); background: var(--panel); }
+  .upload:focus-within { border-color: var(--accent); }
+  .upload .field { flex: 1 1 18rem; min-width: 0; }
+  .upload label { display: block; margin-bottom: .4rem; }
+  .upload input[type=file] { width: 100%; font: inherit; color: var(--muted); }
+  .upload input[type=file]::file-selector-button { font: inherit; font-weight: 550; margin-inline-end: .8rem; padding: .45rem .9rem;
+            border: 1px solid var(--line-strong); border-radius: 8px; background: var(--panel-2); color: var(--text); cursor: pointer; }
+  .upload input[type=file]::file-selector-button:hover { border-color: var(--accent); }
+  .upload button { flex: 0 0 auto; }
+  @media (max-width: 30rem) { .upload button { width: 100%; } }
+</style>
+<form class="panel upload" action="/analyze" method="post" enctype="multipart/form-data">
+  <div class="field">
+    <label for="file"><strong>CSV file</strong></label>
+    <input id="file" type="file" name="file" accept=".csv" required>
+  </div>
+  <button type="submit">Analyze file</button>
 </form>
 
 {% if reports %}
@@ -23,7 +38,7 @@
         <td class="num">{{ r.dataset.n_rows }}</td>
         <td class="num">{{ r.dataset.n_columns }}</td>
         <td>{{ "Complete" if r.status == "completed" else "No AI summary" }}</td>
-        <td class="muted">{{ r.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+        <td class="muted" style="white-space:nowrap">{{ r.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
       </tr>
     {% endfor %}
     </tbody>

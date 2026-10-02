@@ -4,7 +4,7 @@
 {% set ts = stats.time_series %}
 {% set ov = stats.overview %}
 
-<p><a href="/">Back to uploads</a></p>
+<a class="back" href="/">&larr; Back to uploads</a>
 <h1>{{ report.dataset.original_filename }}</h1>
 <p class="muted">Report #{{ report.id }} · {{ report.created_at.strftime("%Y-%m-%d %H:%M") }} · model {{ report.llm_model }}</p>
 
@@ -13,37 +13,41 @@
   <div><dt>Columns</dt><dd>{{ ov.columns }}</dd></div>
   <div><dt>Missing cells</dt><dd>{{ ov.missing_pct | fmt }}%</dd></div>
   {% if ov.date_range %}
-  <div><dt>Date range</dt><dd style="font-size:1rem">{{ ov.date_range.start }} to {{ ov.date_range.end }}</dd></div>
+  <div><dt>Date range</dt><dd style="font-size:1rem;line-height:1.9">{{ ov.date_range.start }} to {{ ov.date_range.end }}</dd></div>
   {% endif %}
 </dl>
 
 {% if ts %}
 <h2>{{ ts.measure }} by {{ ts.granularity }}</h2>
 <div class="panel">
-  <p style="margin-top:0">
+  <p style="margin-top:0;font-size:1.05rem">
     <strong>{{ ts.last_change_pct | pct }}</strong> from {{ ts.previous_period }} to {{ ts.last_period }}
     <span class="muted"> · {{ ts.total_change_pct | pct }} since the first period · trend {{ ts.trend or "unclear" }}</span>
   </p>
-  <canvas id="series" height="110" role="img" aria-label="{{ ts.measure }} over time"></canvas>
+  <div style="position:relative;width:100%;overflow:hidden">
+    <canvas id="series" height="110" role="img" aria-label="{{ ts.measure }} over time"></canvas>
+  </div>
 </div>
 {% endif %}
 
-<h2>Summary</h2>
+<div class="section-head">
+  <h2>Summary</h2>
+  <form action="/reports/{{ report.id }}/regenerate" method="post">
+    <button class="quiet" type="submit">Regenerate summary</button>
+  </form>
+</div>
 {% if report.error %}
 <div class="notice warn" role="status">
   {{ report.error }}
 </div>
 {% endif %}
-<form action="/reports/{{ report.id }}/regenerate" method="post" style="margin:.5rem 0">
-  <button class="quiet" type="submit">Regenerate summary</button>
-</form>
 {% if report.summary %}
 <article class="panel summary-content" dir="auto">{{ report.summary | summary_markdown }}</article>
 {% endif %}
 
 {% if stats.warnings %}
 <h2>Data quality</h2>
-<ul>{% for w in stats.warnings %}<li>{{ w }}</li>{% endfor %}</ul>
+<ul class="plain-list">{% for w in stats.warnings %}<li>{{ w }}</li>{% endfor %}</ul>
 {% endif %}
 
 {% if stats.measures %}
@@ -78,7 +82,7 @@
 
 {% if stats.correlations %}
 <h2>Strong correlations</h2>
-<ul>{% for c in stats.correlations %}<li>{{ c.a }} and {{ c.b }}: r = {{ c.r }}</li>{% endfor %}</ul>
+<ul class="plain-list">{% for c in stats.correlations %}<li>{{ c.a }} and {{ c.b }}: r = {{ c.r }}</li>{% endfor %}</ul>
 {% endif %}
 
 <h2>How the columns were read</h2>
